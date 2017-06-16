@@ -1,298 +1,97 @@
 package dialog.bqt.com.dialogplustest;
 
-import android.app.Activity;
+import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.RadioGroup;
-import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.DialogPlusBuilder;
 import com.orhanobut.dialogplus.GridHolder;
 import com.orhanobut.dialogplus.Holder;
 import com.orhanobut.dialogplus.ListHolder;
-import com.orhanobut.dialogplus.OnBackPressListener;
-import com.orhanobut.dialogplus.OnCancelListener;
-import com.orhanobut.dialogplus.OnClickListener;
-import com.orhanobut.dialogplus.OnDismissListener;
-import com.orhanobut.dialogplus.OnItemClickListener;
 import com.orhanobut.dialogplus.ViewHolder;
 
-public class MainActivity extends Activity {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 
-	private RadioGroup radioGroup;
-	private CheckBox headerCheckBox;
-	private CheckBox footerCheckBox;
-	private CheckBox expandedCheckBox;
+public class MainActivity extends ListActivity {
+	private boolean expanded = false;
 
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-
-		radioGroup = (RadioGroup) findViewById(R.id.radio_group);
-		headerCheckBox = (CheckBox) findViewById(R.id.header_check_box);
-		footerCheckBox = (CheckBox) findViewById(R.id.footer_check_box);
-		expandedCheckBox = (CheckBox) findViewById(R.id.expanded_check_box);
-
-		findViewById(R.id.button_bottom).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showDialog(
-						radioGroup.getCheckedRadioButtonId(),
-						Gravity.BOTTOM,
-						headerCheckBox.isChecked(),
-						footerCheckBox.isChecked(),
-						expandedCheckBox.isChecked()
-				);
-			}
-		});
-
-		findViewById(R.id.button_center).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showDialog(
-						radioGroup.getCheckedRadioButtonId(),
-						Gravity.CENTER,
-						headerCheckBox.isChecked(),
-						footerCheckBox.isChecked(),
-						expandedCheckBox.isChecked()
-				);
-			}
-		});
-
-		findViewById(R.id.button_top).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showDialog(
-						radioGroup.getCheckedRadioButtonId(),
-						Gravity.TOP,
-						headerCheckBox.isChecked(),
-						footerCheckBox.isChecked(),
-						expandedCheckBox.isChecked()
-				);
-			}
-		});
-
-		View contentView = getLayoutInflater().inflate(R.layout.content2, null);
-		DialogPlus dialogPlus = DialogPlus.newDialog(this)
-				.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new String[]{"asdfa"}))
-				.setCancelable(true)
-				.setOnDismissListener(new OnDismissListener() {
-					@Override
-					public void onDismiss(DialogPlus dialog) {
-
-					}
-				})
-				.setOnCancelListener(new OnCancelListener() {
-					@Override
-					public void onCancel(DialogPlus dialog) {
-
-					}
-				})
-				.setOnBackPressListener(new OnBackPressListener() {
-					@Override
-					public void onBackPressed(DialogPlus dialogPlus) {
-
-					}
-				})
-				.create();
-
-		dialogPlus.show();
+		String[] array = {"DialogPlus官方demo",
+				"ViewHolder，BOTTOM",
+				"ViewHolder，TOP",
+				"ListHolder，ArrayAdapter，CENTER",
+				"ListHolder，自定义Adapter，【CENTER_HORIZONTAL】",
+				"GridHolder，自定义Adapter，CENTER_VERTICAL",};
+		setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>(Arrays.asList(array))));
 	}
 
-	private void showDialog(int holderId, int gravity, boolean showHeader, boolean showFooter, boolean expanded) {
-		boolean isGrid;
-		Holder holder;
-		switch (holderId) {
-			case R.id.basic_holder_radio_button:
-				holder = new ViewHolder(R.layout.content);
-				isGrid = false;
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		expanded = !expanded;
+		switch (position) {
+			case 0:
+				startActivity(new Intent(this, DialogPlusActivity.class));
 				break;
-			case R.id.list_holder_radio_button:
-				holder = new ListHolder();
-				isGrid = false;
+			case 1:
+				showDialogPlus(new ViewHolder(R.layout.content), null, Gravity.BOTTOM, expanded);
 				break;
-			default:
-				holder = new GridHolder(3);
-				isGrid = true;
+			case 2:
+				showDialogPlus(new ViewHolder(R.layout.content2), null, Gravity.TOP, expanded);
+				break;
+			case 3:
+				String[] array = new String[]{"包青天", "白乾涛", "baiqiantao", "0909082401"};
+				showDialogPlus(new ListHolder(), new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, array)
+						, Gravity.CENTER, expanded);
+				break;
+			case 4:
+				showDialogPlus(new ListHolder(), new SimpleAdapter(this, false), Gravity.CENTER_HORIZONTAL, expanded);
+				break;
+			case 5:
+				showDialogPlus(new GridHolder(3), new SimpleAdapter(this, true), Gravity.CENTER_VERTICAL, expanded);
+				break;
 		}
-
-		OnClickListener clickListener = new OnClickListener() {
-			@Override
-			public void onClick(DialogPlus dialog, View view) {
-				//        switch (view.getId()) {
-				//          case R.id.header_container:
-				//            Toast.makeText(MainActivity.this, "Header clicked", Toast.LENGTH_LONG).show();
-				//            break;
-				//          case R.id.like_it_button:
-				//            Toast.makeText(MainActivity.this, "We're glad that you like it", Toast.LENGTH_LONG).show();
-				//            break;
-				//          case R.id.love_it_button:
-				//            Toast.makeText(MainActivity.this, "We're glad that you love it", Toast.LENGTH_LONG).show();
-				//            break;
-				//          case R.id.footer_confirm_button:
-				//            Toast.makeText(MainActivity.this, "Confirm button clicked", Toast.LENGTH_LONG).show();
-				//            break;
-				//          case R.id.footer_close_button:
-				//            Toast.makeText(MainActivity.this, "Close button clicked", Toast.LENGTH_LONG).show();
-				//            break;
-				//        }
-				//        dialog.dismiss();
-			}
-		};
-
-		OnItemClickListener itemClickListener = new OnItemClickListener() {
-			@Override
-			public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-				TextView textView = (TextView) view.findViewById(R.id.text_view);
-				String clickedAppName = textView.getText().toString();
-				//        dialog.dismiss();
-				//        Toast.makeText(MainActivity.this, clickedAppName + " clicked", Toast.LENGTH_LONG).show();
-			}
-		};
-
-		OnDismissListener dismissListener = new OnDismissListener() {
-			@Override
-			public void onDismiss(DialogPlus dialog) {
-				//        Toast.makeText(MainActivity.this, "dismiss listener invoked!", Toast.LENGTH_SHORT).show();
-			}
-		};
-
-		OnCancelListener cancelListener = new OnCancelListener() {
-			@Override
-			public void onCancel(DialogPlus dialog) {
-				//        Toast.makeText(MainActivity.this, "cancel listener invoked!", Toast.LENGTH_SHORT).show();
-			}
-		};
-
-		SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, isGrid);
-		if (showHeader && showFooter) {
-			showCompleteDialog(holder, gravity, adapter, clickListener, itemClickListener, dismissListener, cancelListener,
-					expanded);
-			return;
-		}
-
-		if (showHeader && !showFooter) {
-			showNoFooterDialog(holder, gravity, adapter, clickListener, itemClickListener, dismissListener, cancelListener,
-					expanded);
-			return;
-		}
-
-		if (!showHeader && showFooter) {
-			showNoHeaderDialog(holder, gravity, adapter, clickListener, itemClickListener, dismissListener, cancelListener,
-					expanded);
-			return;
-		}
-
-		showOnlyContentDialog(holder, gravity, adapter, itemClickListener, dismissListener, cancelListener, expanded);
 	}
 
-	private void showCompleteDialog(Holder holder, int gravity, BaseAdapter adapter,
-	                                OnClickListener clickListener, OnItemClickListener itemClickListener,
-	                                OnDismissListener dismissListener, OnCancelListener cancelListener,
-	                                boolean expanded) {
-		final DialogPlus dialog = DialogPlus.newDialog(this)
-				.setContentHolder(holder)
-				.setHeader(R.layout.header)
-				.setFooter(R.layout.footer)
+	private void showDialogPlus(Holder holder, BaseAdapter adapter, int gravity, boolean expanded) {
+		DialogPlusBuilder builder = DialogPlus.newDialog(this)
+				.setContentHolder(holder)//必须设置，ViewHolder或ListHolder或GridHolder
+				.setGravity(gravity)//支持三种：BOTTOM (default), TOP or CENTER
+				.setExpanded(expanded, 600)//是否可扩展。setExpanded(true)
 				.setCancelable(true)
-				.setGravity(gravity)
-				.setAdapter(adapter)
-				.setOnClickListener(clickListener)
-				.setOnItemClickListener(new OnItemClickListener() {
-					@Override
-					public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-						Log.d("DialogPlus", "onItemClick() called with: " + "item = [" +
-								item + "], position = [" + position + "]");
-					}
-				})
-				.setOnDismissListener(dismissListener)
-				.setExpanded(expanded)
-//        .setContentWidth(800)
+
+				.setMargin(0, 100, 0, 0)//Add margins to your dialog. They are set to 0 except when gravity is center.
+				.setOutMostMargin(0, 0, 0, 0)//Add margins to your outmost view which contains everything. 默认为0
+
+				.setContentWidth(700)
 				.setContentHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-				.setOnCancelListener(cancelListener)
-				.setOverlayBackgroundResource(android.R.color.transparent)
-//        .setContentBackgroundResource(R.drawable.corner_background)
-				//                .setOutMostMargin(0, 100, 0, 0)
-				.create();
-		dialog.show();
-	}
 
-	private void showNoFooterDialog(Holder holder, int gravity, BaseAdapter adapter,
-	                                OnClickListener clickListener, OnItemClickListener itemClickListener,
-	                                OnDismissListener dismissListener, OnCancelListener cancelListener,
-	                                boolean expanded) {
-		final DialogPlus dialog = DialogPlus.newDialog(this)
-				.setContentHolder(holder)
-				.setHeader(R.layout.header)
-				.setCancelable(true)
-				.setGravity(gravity)
-				.setAdapter(adapter)
-				.setOnClickListener(clickListener)
-				.setOnItemClickListener(new OnItemClickListener() {
-					@Override
-					public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-						Log.d("DialogPlus", "onItemClick() called with: " + "item = [" +
-								item + "], position = [" + position + "]");
-					}
-				})
-				.setOnDismissListener(dismissListener)
-				.setOnCancelListener(cancelListener)
-				.setExpanded(expanded)
-				.create();
-		dialog.show();
-	}
+				.setContentBackgroundResource(R.drawable.corner_background)
+				.setOverlayBackgroundResource(android.R.color.holo_blue_light)
 
-	private void showNoHeaderDialog(Holder holder, int gravity, BaseAdapter adapter,
-	                                OnClickListener clickListener, OnItemClickListener itemClickListener,
-	                                OnDismissListener dismissListener, OnCancelListener cancelListener,
-	                                boolean expanded) {
-		final DialogPlus dialog = DialogPlus.newDialog(this)
-				.setContentHolder(holder)
-				.setFooter(R.layout.footer)
-				.setCancelable(true)
-				.setGravity(gravity)
-				.setAdapter(adapter)
-				.setOnClickListener(clickListener)
-				.setOnItemClickListener(new OnItemClickListener() {
-					@Override
-					public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-						Log.d("DialogPlus", "onItemClick() called with: " + "item = [" +
-								item + "], position = [" + position + "]");
-					}
-				})
-				.setOnDismissListener(dismissListener)
-				.setOnCancelListener(cancelListener)
-				.setExpanded(expanded)
-				.create();
-		dialog.show();
-	}
+				.setInAnimation(com.orhanobut.dialogplus.R.anim.fade_in_center)//slide_in_top、slide_in_bottom、fade_in_center
+				.setOutAnimation(com.orhanobut.dialogplus.R.anim.fade_out_center)
 
-	private void showOnlyContentDialog(Holder holder, int gravity, BaseAdapter adapter,
-	                                   OnItemClickListener itemClickListener, OnDismissListener dismissListener,
-	                                   OnCancelListener cancelListener, boolean expanded) {
-		final DialogPlus dialog = DialogPlus.newDialog(this)
-				.setContentHolder(holder)
-				.setGravity(gravity)
-				.setAdapter(adapter)
-				.setOnItemClickListener(new OnItemClickListener() {
-					@Override
-					public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-						Log.d("DialogPlus", "onItemClick() called with: " + "item = [" +
-								item + "], position = [" + position + "]");
-					}
-				})
-				.setOnDismissListener(dismissListener)
-				.setOnCancelListener(cancelListener)
-				.setExpanded(expanded)
-				.setCancelable(true)
-				.create();
-		dialog.show();
+				.setOnClickListener((dialog, view) -> Toast.makeText(this, "onClick", Toast.LENGTH_SHORT).show())
+				.setOnItemClickListener((dialog, item, view, position) -> Toast.makeText(this, "onItemClick," + position, 0).show())
+				.setOnDismissListener(dialog -> Toast.makeText(this, "onDismiss", Toast.LENGTH_SHORT).show())
+				.setOnCancelListener(dialog -> Toast.makeText(this, "onCancel", Toast.LENGTH_SHORT).show())
+				.setOnBackPressListener(dialogPlus -> Toast.makeText(this, "onBackPressed", Toast.LENGTH_SHORT).show());
+
+		if (adapter != null) builder.setAdapter(adapter);//ListView或GridView时使用的adapter，ViewHolder不需要
+		if (new Random().nextBoolean()) builder.setHeader(R.layout.header);
+		if (new Random().nextBoolean()) builder.setFooter(R.layout.footer);
+
+		builder.create().show();
 	}
 }
